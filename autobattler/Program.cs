@@ -10,15 +10,81 @@ namespace autobattler
     class Card
     {
         public string Name { get; set; }
+        public int AttackSpeedModifier { get; set; }
+        public int DrawSpeedModifier { get; set; }
+        public int HealthModifier { get; set; }
+        public int BlockModifier { get; set; }
 
-        public Card(string name)
+        public Card(string name, int attackSpeedModifier = 0, int drawSpeedModifier = 0, int healthModifier = 0, int blockModfier = 0)
         {
             Name = name;
+            AttackSpeedModifier = attackSpeedModifier;
+            DrawSpeedModifier = drawSpeedModifier;
+            HealthModifier = healthModifier;
+            BlockModifier = blockModfier;
         }
 
         public override string ToString()
         {
             return Name;
+        }
+
+        public virtual string Play(Player player)
+        {
+            return $"{player} played {Name}";
+        }
+
+    }
+
+    class QuickDraw : Card
+    {
+        public QuickDraw(string name)
+            :base(name)
+        {
+            // additinal initialization
+        }
+
+        public override string Play(Player player)
+        {
+            string res = base.Play(player);
+            player.AlterDrawSpeed(-1000);
+            return $"{res} and lowered their attack speed";
+        }
+
+
+    }
+
+    class QuickAttack : Card
+    {
+        public QuickAttack(string name)
+            :base(name)
+        {
+            // add additinal inititialization here
+        }
+
+        public override string Play(Player player)
+        {
+            string res = base.Play(player);
+            player.AlterAttackSpeed(-1000);
+            return $"{res} and lowered their draw speed.";
+            
+        }
+
+    }
+
+    class Block : Card
+    {
+        public Block(string name)
+            :base(name)
+        {
+            // additinal initialization
+        }
+
+        public override string Play(Player player)
+        {
+            string res =  base.Play(player);
+            player.AlterBlock(10);
+            return $"{res} and added block";
         }
     }
 
@@ -41,8 +107,10 @@ namespace autobattler
             Health = maxhealth;
             MaxHealth = maxhealth;
             Block = block;
+        }
 
-            // initialize timers when character created
+        public void StartCombat()
+        {
             StartAttacking();
             StartDrawingCards();
         }
@@ -95,6 +163,23 @@ namespace autobattler
         {
             Console.WriteLine($"{Name} attacked");
         }
+
+        public void AlterAttackSpeed(int speed)
+        {
+            AttackSpeed += speed;
+        }
+
+        public void AlterBlock(int block)
+        {
+            Block += block;
+        }
+
+        private Card MakeRandomCard()
+        {
+            Random random = new Random();
+            return new Card("Random Card",random.Next(-1000,1000),random.Next(-1000,1000),random.Next(-10,10),random.Next(0,10));
+        }
+
     }
 
     class Program
