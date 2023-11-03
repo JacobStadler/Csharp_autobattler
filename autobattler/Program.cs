@@ -180,6 +180,18 @@ namespace autobattler
             return new Card("Random Card",random.Next(-1000,1000),random.Next(-1000,1000),random.Next(-10,10),random.Next(0,10));
         }
 
+        public Card ChooseCard(List<Card> cards)
+        {
+            for (int i = 0;i < cards.Count;i++)
+            {
+                Console.WriteLine($"{cards[i].Name}");
+            }
+            string usrInput = Console.ReadLine();
+            int intusrInput = Int32.Parse(usrInput);
+            Deck.Add(cards[intusrInput]);
+            return cards[intusrInput];
+        }
+
     }
 
     class Program
