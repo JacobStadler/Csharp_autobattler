@@ -26,12 +26,20 @@ namespace autobattler
 
         public override string ToString()
         {
-            return Name;
+            return $"{Name} ASM: {AttackSpeedModifier} DSM: {DrawSpeedModifier} HM: {HealthModifier} BM: {BlockModifier}";
         }
 
         public virtual string Play(Player player)
         {
+            ApplyEffects(player);
             return $"{player} played {Name}";
+        }
+
+        public virtual void ApplyEffects(Player player)
+        {
+            player.AlterAttackSpeed(AttackSpeedModifier);
+            player.AlterDrawSpeed(DrawSpeedModifier);
+            player.AlterBlock(BlockModifier);
         }
 
     }
@@ -92,16 +100,19 @@ namespace autobattler
     {
         public string Name { get; set;}
         public Card[] Deck { get; set;}
+        public List<Card> DiscardPile { get; private set;}
         public int DrawSpeed { get; set;} // Draw speed in milliseconds
         public int AttackSpeed { get; set;} // Attack speed in milliseconds
         public int Health { get; set;}
         public int MaxHealth { get; set;}
         public int Block { get; set;}
+        private Random random = new Random();
 
         public Player(string name,int drawspeed,int attackspeed,int maxhealth,int block)
         {
             Name = name;
-            Deck = new Card[5];
+            Deck = new Card[10];
+            DiscardPile = new List<Card>();
             DrawSpeed = drawspeed;
             AttackSpeed = attackspeed;
             Health = maxhealth;
@@ -115,10 +126,32 @@ namespace autobattler
             StartDrawingCards();
         }
 
+        public void AlterHealth(int health)
+        {
+            Health += health;
+            if (Health < 0)
+            {
+                Health = 0;
+            }
+        }
+
         public void DisplayDeck()
         {
             Console.WriteLine($"{Name}'s Deck:");
             foreach (var card in Deck)
+            {
+                if (card != null)
+                {
+                    Console.WriteLine(card.ToString());
+                }
+            }
+        }
+
+
+        public void DisplayDiscard()
+        {
+            Console.WriteLine($"{Name}'s Discard:");
+            foreach (var card in DiscardPile)
             {
                 if (card != null)
                 {
@@ -134,7 +167,47 @@ namespace autobattler
 
         private void DrawCard(object state)
         {
-            Console.WriteLine($"{Name} drew a card at {DateTime.Now}");
+            if (Deck[0] != null)
+            {
+                Card drawnCard = Deck[0];
+                Console.WriteLine($"{Name} drew {drawnCard.Name} at {DateTime.Now}");
+                PlayCard(drawnCard);
+
+                for (int i = 0; i < Deck.Length - 1; i++)
+                {
+                    Deck[i] = Deck[i + 1];
+                }
+                Deck[Deck.Length - 1] = null;
+            }
+            else
+            {
+                ShuffleDiscardIntoDeck();
+            }
+        }
+
+        public void ShuffleDiscardIntoDeck()
+        {
+            int discardCount = DiscardPile.Count;
+
+            for (int i = 0;i < discardCount; i++)
+            {
+                int randomIndex = random.Next(0, DiscardPile.Count);
+                Card cardToMove = DiscardPile[randomIndex];
+
+                for (int j = 0;j<Deck.Length;j++)
+                {
+                    if (Deck[j] == null)
+                    {
+                        Deck[j] = cardToMove;
+                        break;
+                    }
+                }
+
+                // Remove card from discard pile
+                DiscardPile.RemoveAt(randomIndex);
+            }
+
+            Console.WriteLine($"{Name} Reshuffled");
         }
 
         public void AlterDrawSpeed(int speed)
@@ -174,24 +247,68 @@ namespace autobattler
             Block += block;
         }
 
-        private Card MakeRandomCard()
+        public Card MakeTotalRandomCard()
         {
-            Random random = new Random();
-            return new Card("Random Card",random.Next(-1000,1000),random.Next(-1000,1000),random.Next(-10,10),random.Next(0,10));
+            //Random random = new Random();
+            return new Card("Random Card", random.Next(-1000,1000), random.Next(-1000,1000), random.Next(-10,10), random.Next(0,10));
+        }
+
+        public Card MakeSemiRandomCard()
+        {
+            int total = -10;
+            int attackMod = 0;
+            int drawMod = 0;
+            int healthMod = 0;
+            int blockMod = 0;
+            while (total != 0)
+            {
+                attackMod = random.Next(-10, 10);
+                drawMod = random.Next(-10, 10);
+                healthMod = random.Next(-10, 10);
+                blockMod = random.Next(0, 10);
+                total = healthMod + drawMod + attackMod + blockMod;
+            }
+            return new Card("SRandom Card", attackMod * 100, drawMod * 100, healthMod, blockMod);
+            
         }
 
         public Card ChooseCard(List<Card> cards)
         {
             for (int i = 0;i < cards.Count;i++)
             {
-                Console.WriteLine($"{cards[i].Name}");
+                Console.WriteLine($"{i} {cards[i].Name} Attack Speed Mod: {cards[i].AttackSpeedModifier} Draw Speed Mod: {cards[i].DrawSpeedModifier} Health Mod: {cards[i].HealthModifier} Block Modifier: {cards[i].BlockModifier}");
             }
+            Console.WriteLine("Which Card do you want? : ");
             string usrInput = Console.ReadLine();
             int intusrInput = Int32.Parse(usrInput);
-            Deck.Add(cards[intusrInput]);
+            AddCardToDeck(cards[intusrInput]);
             return cards[intusrInput];
         }
 
+        public void PlayCard(Card card) 
+        { 
+            Console.WriteLine($"{Name} played {card.Name}");
+
+            DiscardPile.Add(card);
+
+        }
+
+        public void ThreeRandomCards()
+        {
+            List<Card> Choices = new List<Card>();
+            Choices.Add(MakeSemiRandomCard());
+            Choices.Add(MakeSemiRandomCard());
+            Choices.Add(MakeSemiRandomCard());
+            Card chosenCard = ChooseCard(Choices);
+            Console.WriteLine($"{chosenCard.Name} Attack Speed Mod: {chosenCard.AttackSpeedModifier} Draw Speed Mod: {chosenCard.DrawSpeedModifier} Health Mod: {chosenCard.HealthModifier} Block Modifier: {chosenCard.BlockModifier}");
+        }
+
+        public void ThreeRandom_RandomCards()
+        {
+            AddCardToDeck(MakeSemiRandomCard());
+            AddCardToDeck(MakeSemiRandomCard());
+            AddCardToDeck(MakeSemiRandomCard());
+        }
     }
 
     class Program
@@ -199,11 +316,18 @@ namespace autobattler
        static void Main(string[] args)
         {
             Player player1 = new Player("Sus", 2000, 1000, 20, 0);
-            player1.AddCardToDeck(new Card("Silent Visage"));
-            player1.AddCardToDeck(new Card("Invigorate"));
+            player1.ThreeRandomCards();
+            player1.ThreeRandomCards();
+            player1.ThreeRandomCards();
+            //player1.AddCardToDeck(new Card("Silent Visage"));
+            //player1.AddCardToDeck(new Card("Invigorate"));
             Player player2 = new Player("Usu", 1500, 1500, 20, 0);
-            player2.AddCardToDeck(new Card("Silent Visage"));
+            //player2.AddCardToDeck(new Card("Silent Visage"));
+            player2.ThreeRandom_RandomCards();
             player1.DisplayDeck();
+
+            player1.StartCombat();
+            player2.StartCombat();
 
             //Timer timer = new Timer(Mainblock, null, 0, 1000); // 1000 ms = 1 second
 
