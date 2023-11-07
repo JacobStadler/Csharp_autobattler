@@ -107,6 +107,7 @@ namespace autobattler
         public int MaxHealth { get; set;}
         public int Block { get; set;}
         private Random random = new Random();
+        private List<Timer> activeTimers = new List<Timer>();
 
         public Player(string name,int drawspeed,int attackspeed,int maxhealth,int block)
         {
@@ -120,10 +121,19 @@ namespace autobattler
             Block = block;
         }
 
-        public void StartCombat()
+        public void StartCombat(Player target)
         {
-            StartAttacking();
+            StartAttacking(target);
             StartDrawingCards();
+        }
+
+        public void CancelAllTimers() 
+        {
+            foreach(var timer in activeTimers)
+            {
+                timer.Dispose();
+            }
+            activeTimers.Clear();
         }
 
         public void AlterHealth(int health)
@@ -162,26 +172,33 @@ namespace autobattler
 
         public void StartDrawingCards()
         {
-           Timer timer = new Timer(DrawCard, null, 0, DrawSpeed);
+           Timer drawTimer = new Timer(DrawCard, null, 0, DrawSpeed);
+            activeTimers.Add(drawTimer);
         }
 
         private void DrawCard(object state)
         {
-            if (Deck[0] != null)
+            if (Health <= 0)
             {
-                Card drawnCard = Deck[0];
-                Console.WriteLine($"{Name} drew {drawnCard.Name} at {DateTime.Now}");
-                PlayCard(drawnCard);
-
-                for (int i = 0; i < Deck.Length - 1; i++)
-                {
-                    Deck[i] = Deck[i + 1];
-                }
-                Deck[Deck.Length - 1] = null;
+                CancelAllTimers();
             }
-            else
-            {
-                ShuffleDiscardIntoDeck();
+            else {
+                if (Deck[0] != null)
+                {
+                    Card drawnCard = Deck[0];
+                    Console.WriteLine($"{Name} drew {drawnCard.Name} at {DateTime.Now}");
+                    PlayCard(drawnCard);
+
+                    for (int i = 0; i < Deck.Length - 1; i++)
+                    {
+                        Deck[i] = Deck[i + 1];
+                    }
+                    Deck[Deck.Length - 1] = null;
+                }
+                else
+                {
+                    ShuffleDiscardIntoDeck();
+                }
             }
         }
 
@@ -227,14 +244,21 @@ namespace autobattler
             }
         }
 
-        public void StartAttacking()
+        public void StartAttacking(Player target)
         {
-            Timer attackTimer = new Timer(Attack,null, 0, AttackSpeed);
+            Timer attackTimer = new Timer(state => Attack(state, target), null, 0, AttackSpeed);
+            activeTimers.Add(attackTimer);
         }
 
-        private void Attack(object state)
+        private void Attack(object state, Player target)
         {
-            Console.WriteLine($"{Name} attacked");
+            if (Health <= 0)
+            {
+                CancelAllTimers();
+            }
+            else {
+                Console.WriteLine($"{Name} attacked {target.Name}");
+            }
         }
 
         public void AlterAttackSpeed(int speed)
@@ -326,8 +350,8 @@ namespace autobattler
             player2.ThreeRandom_RandomCards();
             player1.DisplayDeck();
 
-            player1.StartCombat();
-            player2.StartCombat();
+            player1.StartCombat(player2);
+            player2.StartCombat(player1);
 
             //Timer timer = new Timer(Mainblock, null, 0, 1000); // 1000 ms = 1 second
 
