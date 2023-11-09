@@ -41,7 +41,6 @@ namespace autobattler
             player.AlterDrawSpeed(DrawSpeedModifier);
             player.AlterBlock(BlockModifier);
         }
-
     }
 
     class QuickDraw : Card
@@ -58,8 +57,6 @@ namespace autobattler
             player.AlterDrawSpeed(-1000);
             return $"{res} and lowered their attack speed";
         }
-
-
     }
 
     class QuickAttack : Card
@@ -99,6 +96,7 @@ namespace autobattler
     class Player
     {
         public string Name { get; set;}
+        public Weapon Weapon { get; set;}
         public Card[] Deck { get; set;}
         public List<Card> DiscardPile { get; private set;}
         public int DrawSpeed { get; set;} // Draw speed in milliseconds
@@ -109,7 +107,7 @@ namespace autobattler
         private Random random = new Random();
         private List<Timer> activeTimers = new List<Timer>();
 
-        public Player(string name,int drawspeed,int attackspeed,int maxhealth,int block)
+        public Player(string name, int drawspeed, int attackspeed, int maxhealth, int block, Weapon weapon)
         {
             Name = name;
             Deck = new Card[10];
@@ -119,6 +117,7 @@ namespace autobattler
             Health = maxhealth;
             MaxHealth = maxhealth;
             Block = block;
+            Weapon = weapon ?? new IronSword();
         }
 
         public void StartCombat(Player target)
@@ -257,7 +256,8 @@ namespace autobattler
                 CancelAllTimers();
             }
             else {
-                Console.WriteLine($"{Name} attacked {target.Name}");
+                target.AlterHealth(Weapon.Damage);
+                Console.WriteLine($"{Name} attacked {target.Name} dealing {Weapon.Damage}.");
             }
         }
 
@@ -335,17 +335,38 @@ namespace autobattler
         }
     }
 
+    class Weapon
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int Damage { get; set; }
+
+        public Weapon(string weaponName, string weaponDescription, int weaponDamange) 
+        {
+            Name = weaponName; Description = weaponDescription; Damage = weaponDamange;
+        }
+    }
+
+    class IronSword : Weapon
+    {
+        public IronSword(string name="Iron Sword",string description = "A simple iron sword",int damage=2)
+            :base(name, description, damage)
+        {
+            // additinal initialization
+        }
+    }
+
     class Program
     {
        static void Main(string[] args)
         {
-            Player player1 = new Player("Sus", 2000, 1000, 20, 0);
+            Player player1 = new Player("Sus", 2000, 2000, 20, 0, null);
             player1.ThreeRandomCards();
             player1.ThreeRandomCards();
             player1.ThreeRandomCards();
             //player1.AddCardToDeck(new Card("Silent Visage"));
             //player1.AddCardToDeck(new Card("Invigorate"));
-            Player player2 = new Player("Usu", 1500, 1500, 20, 0);
+            Player player2 = new Player("Usu", 2000, 2000, 20, 0, null);
             //player2.AddCardToDeck(new Card("Silent Visage"));
             player2.ThreeRandom_RandomCards();
             player1.DisplayDeck();
