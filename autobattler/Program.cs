@@ -1,12 +1,75 @@
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace autobattler
 {
+    public class Game1 : Game1
+    {
+        private GraphicsDeviceManager _graphics;
+        private SpriteBatch _spriteBatch;
+
+        private Player player3;
+        private Player player4;
+
+        public Game1()
+        {
+            _graphics = new GraphicsDeviceManager(this);
+            ContentDisposition.RootDirectory = "Content";
+        }
+
+        protected override void Initialize()
+        {
+            player3 = new Player("Sus", 2000, 2000, 20, 0, null);
+            player4 = new Player("Usu", 2000, 2000, 20, 0, null);
+            base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+        }
+
+        protected override void Update(GameTime gameTime)
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
+                Exit(this);
+            }
+            player3.Update(gameTime);
+            player4.Update(gameTime);
+
+            base.Update(gameTime);
+        }
+
+        protected override void Draw(GameTime gameTime) 
+        {
+            GraphicsDevice.Clear(ConsoleColor.CornflowerBlue);
+            _spriteBatch.Begin();
+
+            player3.Draw(_spriteBatch);
+            player4.Draw(_spriteBatch);
+
+            _spriteBatch.End();
+
+            base.Draw(gameTime);
+        }
+
+        static void Main()
+        {
+            using (var game = new Game1())
+            {
+                game.Run();
+            }
+        }
+    }
     class Card
     {
         public string Name { get; set; }

@@ -1,10 +1,3 @@
-C:\Users\jacobs\Documents\GitHub\Csharp_autobattler\autobattler\bin\Debug\autobattler.exe.config
-C:\Users\jacobs\Documents\GitHub\Csharp_autobattler\autobattler\bin\Debug\autobattler.exe
-C:\Users\jacobs\Documents\GitHub\Csharp_autobattler\autobattler\bin\Debug\autobattler.pdb
-C:\Users\jacobs\Documents\GitHub\Csharp_autobattler\autobattler\obj\Debug\autobattler.csproj.AssemblyReference.cache
-C:\Users\jacobs\Documents\GitHub\Csharp_autobattler\autobattler\obj\Debug\autobattler.csproj.CoreCompileInputs.cache
-C:\Users\jacobs\Documents\GitHub\Csharp_autobattler\autobattler\obj\Debug\autobattler.exe
-C:\Users\jacobs\Documents\GitHub\Csharp_autobattler\autobattler\obj\Debug\autobattler.pdb
 C:\Users\jackh\Documents\github\Csharp_autobattler\autobattler\bin\Debug\autobattler.exe.config
 C:\Users\jackh\Documents\github\Csharp_autobattler\autobattler\bin\Debug\autobattler.exe
 C:\Users\jackh\Documents\github\Csharp_autobattler\autobattler\bin\Debug\autobattler.pdb
@@ -12,3 +5,5 @@ C:\Users\jackh\Documents\github\Csharp_autobattler\autobattler\obj\Debug\autobat
 C:\Users\jackh\Documents\github\Csharp_autobattler\autobattler\obj\Debug\autobattler.csproj.CoreCompileInputs.cache
 C:\Users\jackh\Documents\github\Csharp_autobattler\autobattler\obj\Debug\autobattler.exe
 C:\Users\jackh\Documents\github\Csharp_autobattler\autobattler\obj\Debug\autobattler.pdb
+C:\Users\jacobs\Documents\GitHub\Csharp_autobattler\autobattler\obj\Debug\autobattler.csproj.AssemblyReference.cache
+C:\Users\jacobs\Documents\GitHub\Csharp_autobattler\autobattler\obj\Debug\autobattler.csproj.CoreCompileInputs.cache
